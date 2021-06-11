@@ -134,3 +134,53 @@ exports.logoutAll = async (req, res) => {
     });
   }
 };
+
+exports.deleteMe = async (req, res) => {
+  try {
+    if (!req.user)
+      res.status(404).json({ status: "fail", message: "No user found" });
+
+    await req.user.remove();
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        user: req.user,
+      },
+    });
+  } catch (err) {
+    res.status(401).json({
+      status: "fail",
+      message: `${err}`,
+    });
+  }
+};
+
+exports.updateMe = async (req, res) => {
+  try {
+    const updates = Object.keys(req.body);
+    console.log(updates);
+    const allowedUpdates = ["name", "email", "password", "age"];
+    const isValidOperation = updates.every(update =>
+      allowedUpdates.includes(update)
+    );
+
+    if (!isValidOperation)
+      return res
+        .status(400)
+        .json({ status: "fail", message: "Invalid updates" });
+
+    updates.forEach(update => (req.user[update] = req.body[update]));
+    await req.user.save();
+
+    res.status(200).json({
+      status: "success",
+      user: req.user,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: `${err}`,
+    });
+  }
+};

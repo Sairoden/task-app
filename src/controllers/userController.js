@@ -93,7 +93,7 @@ exports.deleteUser = async (req, res) => {
       status: "success",
     });
   } catch (err) {
-    res.status(400).json({
+    res.status(401).json({
       status: "fail",
       message: `${err}`,
     });
